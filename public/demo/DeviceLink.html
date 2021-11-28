@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.css">
+    <title>设备端口连线</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        button {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            line-height: 30px;
+            font-size: 20px;
+            cursor: pointer;
+            position: fixed;
+            z-index: 10000;
+            right: 20px;
+        }
+
+        #all {
+            bottom: 100px;
+        }
+
+        #increase {
+            bottom: 60px;
+        }
+
+        #reduce {
+            bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<div id="app" style="width:100vw;height: 100vh;background: aquamarine"></div>
+<button id="all">全</button>
+<button id="increase">+</button>
+<button id="reduce">-</button>
+<!--<i class="fa fa-camera-retro fa-5x" id="text"></i>-->
+<script src="../ViewCanvas.js"></script>
+<script src="../data/deviceData.js"></script>
+<script>
+    let VIEW = View;
+    let el = document.getElementById('app');
+    let canvas = new VIEW.Stage(el, {
+        config: {
+            // fps: 60,
+            mode: VIEW.MODE.EDIT,
+            showViewArea: true,
+            isCanUseSelect: true,
+            // background: 'black'
+        },
+        handler: {
+            otherRenderCall(e) {
+
+            },
+            clickCall(e, el) {
+                if (el.type === 'BrokenLine') {
+                    el.showEditPoint()
+                    // el.showTestLine = true
+                }
+                // console.log('left', el);
+            },
+            cancelCall(e, el) {
+                if (el.type === 'BrokenLine') {
+                    el.clearEditPoint()
+                    // el.showTestLine = false
+                }
+                // console.log('cancel', el);
+            },
+            rightClickCall(e, el) {
+                // console.log('right', el)
+            },
+            centerClickCall(e, el) {
+                // console.log('center', el)
+            },
+            hoverCall(e, el) {
+                // console.log('hover', el);
+            },
+            leaveCall(e, el) {
+                // console.log('leaveCall', el);
+            },
+            dragStartCall(e, el) {
+                // console.log('dragStart', el);
+            },
+            dragCall(e, el) {
+                // console.log('drag', el);
+            },
+            dragEndCall(e) {
+                // console.log('dragEnd', e);
+            },
+            moveCall(e) {
+                // console.log('move', e);
+            },
+            zoomCall(e, flag) {
+                // console.log(flag);
+            },
+            noneClickCall(e) {
+                // console.log('noneClick')
+            },
+            selectCall() {
+                console.log('select', arguments)
+            },
+            cancelSelectCall() {
+                console.log('cancelSelect')
+            }
+        }
+    })
+    let elements = []
+    devices.forEach(d => {
+        let {id, x, y, width, height, inPorts, outPorts} = d
+        let ports = []
+        let r = 3;
+        if (inPorts.length) {
+            let inStep = height / (inPorts.length + 1)
+            inPorts.forEach((p, i) => {
+                ports.push({
+                    id: id + '-in-' + p,
+                    type: 'Circle',
+                    x: 0,
+                    y: inStep * (i + 1) - r,
+                    params: {
+                        r
+                    },
+                    actions: {
+                        default: {
+                            backgroundColor: '#E6A23C',
+                        }
+                    }
+
+                })
+            })
+        }
+        if (outPorts.length) {
+            let outStep = height / (outPorts.length + 1)
+            outPorts.forEach((p, i) => {
+                ports.push({
+                    id: id + '-out-' + p,
+                    type: 'Circle',
+                    x: width - r * 2,
+                    y: outStep * (i + 1) - r,
+                    params: {
+                        r
+                    },
+                    actions: {
+                        default: {
+                            backgroundColor: '#E6A23C',
+                        }
+                    }
+                })
+            })
+        }
+        elements.push({
+            type: 'Container',
+            id,
+            x,
+            y,
+            params: {
+                width,
+                height
+            },
+            actions: {
+                default: {
+                    backgroundColor: 'transparent',
+                }
+            },
+            children: [
+                {
+                    type: 'Rect',
+                    x: 6,
+                    y: 0,
+                    params: {
+                        width: width - 12,
+                        height
+                    },
+                    actions: {
+                        default: {
+                            fontText: id,
+                            fontPosition: 'center',
+                            fontColor: 'white',
+                            backgroundColor: '#67C23A',
+                            // borderSize: 1,
+                            // borderColor: 'blue'
+                        },
+                        hover: {
+                            backgroundColor: 'red'
+                        },
+                        click: {
+                            backgroundColor: 'blue',
+                        },
+                        drag: {
+                            backgroundColor: 'yellow',
+                        }
+                    }
+                },
+                ...ports
+            ]
+        })
+    })
+
+    elements.forEach(el => canvas.addEl(el));
+    let els = canvas.currentScene.layers.element.elements;
+    links.forEach(l => {
+        let {inId, inPort, outId, outPort} = l
+        let end = els.find(el => el.id === inId).children.find(el => el.id === `${inId}-in-${inPort}`)
+        let start = els.find(el => el.id === outId).children.find(el => el.id === `${outId}-out-${outPort}`)
+        let line = {
+            type: 'BrokenLine',
+            params: {
+                start,
+                end,
+                // showTestLine: true
+            },
+            actions: {
+                default: {
+                    lineWidth: 1,
+                    lineColor: 'red',
+                }
+            }
+        }
+        canvas.addEl(line)
+    })
+    canvas.currentScene.showAllView()
+    document.getElementById('all').onclick = () => {
+        canvas.currentScene.showAllView()
+    }
+    document.getElementById('increase').onclick = () => {
+        canvas.currentScene.setZoom(1)
+    }
+    document.getElementById('reduce').onclick = () => {
+        canvas.currentScene.setZoom(-1)
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "default": {
+    "shadowSize": 0
+  },
+  "hover": {
+    "shadowSize": 1
+  },
+  "click": {
+    "shadowSize": 2
+  },
+  "drag": {
+    "shadowSize": 2
+  }
+}

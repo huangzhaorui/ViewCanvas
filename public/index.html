@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.css">
+    <title>ViewCanvas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #menuList > li {
+            padding: 4px 6px;
+            cursor: pointer;
+            margin-bottom: 4px;
+            transition: background .5s, color .5s;
+        }
+
+        #menuList > li:hover {
+            background: cadetblue;
+            color: white;
+        }
+
+        .selectMenu {
+            background: cadetblue;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div style="width: 16%;height: 100vh;float: left;background: ghostwhite">
+    <ul id="menuList"></ul>
+</div>
+<iframe id="showView" frameborder="0" style="width: 84%;height: 100vh;float: left;border: none;"></iframe>
+<script src="menu.js"></script>
+<script>
+    let showView = document.getElementById('showView');
+    showView.onload = e => {
+        console.log('初始化完成')
+    }
+    showView.src = menuList[0].url
+    let menu = document.getElementById('menuList');
+    menuList.forEach((m, i) => {
+        let el = document.createElement('li')
+        el.setAttribute('data-url', m.url)
+        el.innerHTML = m.name
+        if (i === 0) el.classList = ['selectMenu']
+        menu.append(el)
+    })
+    menu.onclick = e => {
+        if (!!e.target.getAttribute('data-url') && showView.src !== location.href + e.target.getAttribute('data-url')) {
+            let list = document.getElementsByTagName('li')
+            for (let i = 0; i < list.length; i++) {
+                if (location.href + list[i].getAttribute('data-url') === showView.src) list[i].classList = [];
+            }
+            showView.src = e.target.getAttribute('data-url')
+            e.target.classList = ['selectMenu']
+        }
+    }
+    // let VIEW = View;
+    // let el = document.getElementById('app');
+    // let canvas = new VIEW.Stage(el, {
+    //     config: {
+    //         fps: 60,
+    //         mode: VIEW.MODE.EDIT,
+    //         background: 'green'
+    //     },
+    //     handler: {
+    //         otherRenderCall(e) {
+    //
+    //         },
+    //         clickCall(e, el) {
+    //             // console.log('left', el);
+    //         },
+    //         cancelCall(e, el) {
+    //             // console.log('cancel', el);
+    //         },
+    //         rightClickCall(e, el) {
+    //             // console.log('right', el)
+    //         },
+    //         centerClickCall(e, el) {
+    //             // console.log('center', el)
+    //         },
+    //         hoverCall(e, el) {
+    //             // console.log('hover', el);
+    //         },
+    //         leaveCall(e, el) {
+    //             // console.log('leaveCall', el);
+    //         },
+    //         dragStartCall(e, el) {
+    //             // console.log('dragStart', el);
+    //         },
+    //         dragCall(e, el) {
+    //             // console.log('drag', el);
+    //         },
+    //         dragEndCall(e) {
+    //             // console.log('dragEnd', e);
+    //         },
+    //         moveCall(e) {
+    //             // console.log('move', e);
+    //         },
+    //         zoomCall(e, flag) {
+    //             // console.log(flag);
+    //         }
+    //     }
+    // })
+    // let elements = [
+    //     // {
+    //     //     type: 'StraightLine',
+    //     //     params: {
+    //     //         // showTestLine: true,
+    //     //         points: [
+    //     //             // {x: 30, y: 30},
+    //     //             {x: 100, y: 20},
+    //     //             {x: 100, y: 100},
+    //     //             {x: 600, y: 100},
+    //     //             {x: 600, y: 200},
+    //     //             {x: 900, y: 200},
+    //     //             {x: 900, y: 500},
+    //     //         ],
+    //     //     },
+    //     //     style: {
+    //     //         lineWidth: 1,
+    //     //         lineColor: 'red',
+    //     //         lineDash: [10, 10],
+    //     //         // lineCap: 'round',
+    //     //         // fontText: '测试',
+    //     //         // fontSize: 16
+    //     //     }
+    //     // },
+    //     {
+    //         type: 'Rect',
+    //         x: 300,
+    //         y: 300,
+    //         params: {
+    //             width: 40,
+    //             height: 40
+    //         },
+    //         style: {
+    //             backgroundColor: 'red',
+    //             // fontText: 'test',
+    //             // fontSize: 40
+    //         }
+    //     },
+    //     {
+    //         type: 'Rect',
+    //         x: 800,
+    //         y: 400,
+    //         params: {
+    //             width: 40,
+    //             height: 40
+    //         },
+    //         style: {
+    //             backgroundColor: 'red',
+    //             // fontText: 'test',
+    //             // fontSize: 40
+    //         }
+    //     }
+    //     // {
+    //     //     type: 'Container',
+    //     //     x: 300,
+    //     //     y: 300,
+    //     //     params: {
+    //     //         width: 200,
+    //     //         height: 200
+    //     //     },
+    //     //     style: {
+    //     //         backgroundColor: '#E6A23C',
+    //     //     },
+    //     //     children: (() => {
+    //     //         let list = []
+    //     //         for (let i = 0; i < 1000; i++) {
+    //     //             list.push({
+    //     //                 type: 'Rect',
+    //     //                 x: 60,
+    //     //                 y: 60,
+    //     //                 params: {
+    //     //                     width: 20,
+    //     //                     height: 20
+    //     //                 },
+    //     //                 style: {
+    //     //                     // backgroundColor: 'blue',
+    //     //                     fontText: 'test',
+    //     //                     // fontSize: 10,
+    //     //                     fontColor: '#F56C6C',
+    //     //                     fontPosition: 'bottom'
+    //     //                 }
+    //     //             })
+    //     //         }
+    //     //         return list
+    //     //     })()
+    //     // }
+    // ]
+    // for (let i = 0; i < 0; i++) {
+    //     // elements.push({
+    //     //     type: 'Container',
+    //     //     x: 1600 * Math.random(),
+    //     //     y: 800 * Math.random(),
+    //     //     params: {
+    //     //         width: 200,
+    //     //         height: 200
+    //     //     },
+    //     //     style: {
+    //     //         backgroundColor: '#E6A23C',
+    //     //     },
+    //     //     children: [
+    //     //         {
+    //     //             type: 'Rect',
+    //     //             x: 60,
+    //     //             y: 60,
+    //     //             params: {
+    //     //                 width: 20,
+    //     //                 height: 20
+    //     //             },
+    //     //             style: {
+    //     //                 backgroundColor: 'rgba(0,0,0,.3)',
+    //     //                 fontText: 'test',
+    //     //                 // fontSize: 10,
+    //     //                 fontColor: '#F56C6C',
+    //     //                 fontPosition: 'bottom'
+    //     //             }
+    //     //         },
+    //     //         {
+    //     //             type: 'Rect',
+    //     //             x: 70,
+    //     //             y: 70,
+    //     //             params: {
+    //     //                 width: 20,
+    //     //                 height: 20
+    //     //             },
+    //     //             style: {
+    //     //                 backgroundColor: 'blue',
+    //     //                 fontText: 'test',
+    //     //                 // fontSize: 10,
+    //     //                 fontColor: '#F56C6C',
+    //     //                 fontPosition: 'bottom'
+    //     //             }
+    //     //         }
+    //     //     ]
+    //     // })
+    //     // elements.push(
+    //     //     {
+    //     //         // type: Math.random() > 0.5 ? "Rect" : "Circle",
+    //     //         type: "Rect",
+    //     //         x: 1600 * Math.random(),
+    //     //         y: 800 * Math.random(),
+    //     //         params: {
+    //     //             width: 60,
+    //     //             height: 60,
+    //     //             r: 30,
+    //     //             canDrag: false,
+    //     //         },
+    //     //         style: {
+    //     //             // backgroundColor: 'red',
+    //     //             backgroundColor: Math.random() > 0.5 ? 'red' : 'blue',
+    //     //             // imgUrl: 'https://th.bing.com/th/id/Rae00f4a82699915907969e514a6c64d0?rik=4Tzu%2f4SDH62ngw&riu=http%3a%2f%2fwww.3dmgame.com%2fuploads%2fallimg%2f150820%2f300_150820222914_2.png&ehk=z1NzE5w2GGDnI9WXv7ic5TKZGc7F2VIbO8O37oXs2ek%3d&risl=&pid=ImgRaw'
+    //     //             fontIcon: '&#xf26e;',
+    //     //             fontColor: 'yellow',
+    //     //             fontSize: 40,
+    //     //             // fontText: '1231'
+    //     //         },
+    //     //         animations: {
+    //     //             backgroundColor: {process: {0: 'red', 100: 'blue'}, duration: 1},
+    //     //             fontColor: {process: {0: 'yellow', 100: 'white'}, duration: 1},
+    //     //             // x: {process: {0: 300, 100: 1200}, duration: 3},
+    //     //             // y: {process: {0: 100, 100: 600}, duration: 3},
+    //     //             // width: {process: {0: 60, 100: 120}, duration: .5},
+    //     //             // height: {process: {0: 60, 100: 120}, duration: .5},
+    //     //             // r: {process: {0: 30, 100: 60}, duration: .5},
+    //     //         }
+    //     //     })
+    //     let x = 1000 * Math.random();
+    //     let y = 400 * Math.random();
+    //     elements.push({
+    //         type: 'StraightLine',
+    //         params: {
+    //             // showTestLine: true,
+    //             points: [
+    //                 // {x: 30, y: 30},
+    //                 // {x: x + 100, y: y + 20},
+    //                 {x: x, y: y},
+    //                 {x: x + 100, y: y + 100}
+    //                 // {x: x + 900, y: y + 500},
+    //             ],
+    //         },
+    //         style: {
+    //             lineWidth: 1,
+    //             lineColor: 'red',
+    //             // lineDash: [10, 10],
+    //             // lineCap: 'round',
+    //             // fontText: '测试',
+    //             // fontSize: 16
+    //         }
+    //     },)
+    // }
+    //
+    // function otherRender(ctx, $) {
+    //     // console.log($)
+    //     let {x, y, width, height} = $
+    //     ctx.beginPath();
+    //     ctx.strokeStyle = 'red'
+    //     ctx.moveTo(x - width / 2, y - height / 2)
+    //     ctx.lineTo(x - width / 2, y + height / 2)
+    //     ctx.lineTo(x + width / 2, y + height / 2)
+    //     ctx.lineTo(x + width / 2, y - height / 2)
+    //     ctx.closePath()
+    //     ctx.stroke()
+    // }
+    //
+    // elements.forEach(el => canvas.addEl(el));
+    // let els = canvas.currentScene.layers.element.elements;
+    // let line = {
+    //     type: 'BrokenLine',
+    //     params: {
+    //         // showTestLine: true,
+    //         start: els[0],
+    //         end: els[1],
+    //     },
+    //     style: {
+    //         lineWidth: 1,
+    //         lineColor: 'red',
+    //     }
+    // }
+    // let l = canvas.addEl(line, 'background')
+    // // l.setEditPoint()
+    // // canvas.createScene('first', {background: 'yellow'});
+    // // setTimeout(() => {
+    // //     canvas.removeScene('default')
+    // //     canvas.switchScene('first')
+    // //     canvas.addEl(elements[0]);
+    // //     canvas.destroy()
+    // // }, 3000)
+</script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "default": {
+    "backgroundColor": "",
+    "imgUrl": "",
+    "fontText": "",
+    "fontIcon": "",
+    "fontClass": "",
+    "fontSize": 12,
+    "fontPosition": "",
+    "borderSize": "",
+    "borderColor": "",
+    "borderType": "",
+    "shadowSize": 0,
+    "shadowOffsetX": "",
+    "shadowOffsetY": "",
+    "shadowColor": "",
+    "lineWidth": "",
+    "lineColor": "",
+    "lineDash": "",
+    "lineCap": ""
+  }
+}

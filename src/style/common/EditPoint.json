@@ -1,0 +1,14 @@
+{
+  "default": {
+    "backgroundColor": "#3399ff"
+  },
+  "hover": {
+    "backgroundColor": "#ff9900"
+  },
+  "click": {
+    "backgroundColor": "#ff9900"
+  },
+  "drag": {
+    "backgroundColor": "#ff9900"
+  }
+}

@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.css">
+    <title>编辑元素</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+<div id="app" style="width:100vw;height: 100vh;background: aquamarine"></div>
+<!--<i class="fa fa-camera-retro fa-5x" id="text"></i>-->
+<script src="../ViewCanvas.js"></script>
+<script>
+    let VIEW = View;
+    let el = document.getElementById('app');
+    let canvas = new VIEW.Stage(el, {
+        config: {
+            // fps: 60,
+            mode: VIEW.MODE.EDIT,
+            // background: 'green'
+        },
+        handler: {
+            otherRenderCall(e) {
+
+            },
+            clickCall(e, el) {
+                el.showEditPoint()
+            },
+            cancelCall(e, el) {
+                el.clearEditPoint()
+            },
+            rightClickCall(e, el) {
+                // console.log('right', el)
+            },
+            centerClickCall(e, el) {
+                // console.log('center', el)
+            },
+            hoverCall(e, el) {
+                // console.log('hover', el);
+            },
+            leaveCall(e, el) {
+                // console.log('leaveCall', el);
+            },
+            dragStartCall(e, el) {
+                // console.log('dragStart', el);
+            },
+            dragCall(e, el) {
+                console.log('drag', el);
+            },
+            dragEndCall(e, el) {
+                // console.log('dragEnd', el);
+            },
+            moveCall(e) {
+                // console.log('move', e);
+            },
+            zoomCall(e, flag) {
+                // console.log(flag);
+            },
+            editCall() {
+                // console.log(arguments)
+            }
+        }
+    })
+    let elements = [
+        {
+            type: 'Rect',
+            x: 200,
+            y: 100,
+            params: {
+                width: 180,
+                height: 400
+            },
+            actions: {
+                default: {
+                    backgroundColor: '#67C23A',
+                    fontText: '田田田',
+                    fontSize: 40,
+                    fontColor: 'white',
+                    fontPosition: 'top'
+                },
+                hover: {
+                    backgroundColor: 'red'
+                },
+                click: {
+                    backgroundColor: 'blue'
+                },
+                drag: {
+                    backgroundColor: 'white'
+                }
+            },
+            animations: {
+                // backgroundColor: {process: {0: 'red', 100: 'blue'}, duration: 1},
+                // fontColor: {process: {0: 'yellow', 100: 'white'}, duration: 1},
+            }
+        }
+    ]
+
+    elements.forEach(el => canvas.addEl(el));
+</script>
+</body>
+</html>

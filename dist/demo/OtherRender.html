@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.css">
+    <title>自定义渲染</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+<div id="app" style="width:100vw;height: 100vh;background: aquamarine"></div>
+<!--<i class="fa fa-camera-retro fa-5x" id="text"></i>-->
+<script src="../ViewCanvas.js"></script>
+<script>
+    let VIEW = View;
+    let el = document.getElementById('app');
+    let canvas = new VIEW.Stage(el, {
+        config: {
+            // fps: 60,
+            mode: VIEW.MODE.EDIT
+        },
+        handler: {
+            otherRenderCall(e) {
+
+            },
+            clickCall(e, el) {
+                // console.log('left', el);
+            },
+            cancelCall(e, el) {
+                // console.log('cancel', el);
+            },
+            rightClickCall(e, el) {
+                // console.log('right', el)
+            },
+            centerClickCall(e, el) {
+                // console.log('center', el)
+            },
+            hoverCall(e, el) {
+                // console.log('hover', el);
+            },
+            leaveCall(e, el) {
+                // console.log('leaveCall', el);
+            },
+            dragStartCall(e, el) {
+                // console.log('dragStart', el);
+            },
+            dragCall(e, el) {
+                // console.log('drag', el);
+            },
+            dragEndCall(e) {
+                // console.log('dragEnd', e);
+            },
+            moveCall(e) {
+                // console.log('move', e);
+            },
+            zoomCall(e, flag) {
+                // console.log(flag);
+            }
+        }
+    })
+    let data = {
+        type: "Rect",
+        x: 100,
+        y: 100,
+        params: {
+            // showTestLine: true,
+            width: 200,
+            height: 400
+        },
+        actions: {
+            default: {
+                // imgUrl: 'https://tse1-mm.cn.bing.net/th/id/R-C.728d1bd929f70ac36b6a0c41f66649f3?rik=K%2fUy9J2nl3HwvA&riu=http%3a%2f%2fimg95.699pic.com%2felement%2f40091%2f4992.png_300.png&ehk=7FPoRCr3wAXJMK2mITZfddPGDZt8pHZiiKlaLrdk%2fjw%3d&risl=&pid=ImgRaw&r=0',
+                // shadowSize: 5,
+                // shadowColor: 'red'
+                backgroundColor: 'blue',
+                fontText: '3124',
+                fontColor: 'green'
+            },
+            hover: {
+                // backgroundColor: 'red'
+            }
+        },
+        animations: {
+            // shadowSize: {process: {0: 0, 100: 60}, duration: 0.5}
+        },
+        otherRender(context) {
+            const {x, y, type, width, height, style} = this;
+            context.save()
+            context.beginPath()
+            context.fillStyle = style.backgroundColor
+            this.drawRect({context, x, y, width, height})
+            context.fill()
+            context.restore()
+            let url1 = 'https://tse1-mm.cn.bing.net/th/id/R-C.728d1bd929f70ac36b6a0c41f66649f3?rik=K%2fUy9J2nl3HwvA&riu=http%3a%2f%2fimg95.699pic.com%2felement%2f40091%2f4992.png_300.png&ehk=7FPoRCr3wAXJMK2mITZfddPGDZt8pHZiiKlaLrdk%2fjw%3d&risl=&pid=ImgRaw&r=0'
+            this.loadImgData({context, type, x, y, width: width / 2, height, url: url1})
+            this.loadImgData({context, type, x: x + width / 2, y, width: width / 2, height: height / 2, url: url1})
+            this.loadImgData({
+                context,
+                type,
+                x: x + width / 2 + 10,
+                y: y + height / 2 + 10,
+                width: width / 2 - 10,
+                height: height / 2 - 10,
+                url: url1
+            })
+            this.loadImgData({
+                context,
+                type: 'Circle',
+                x: x + 20,
+                y: y + 60,
+                r: 80,
+                url: url1
+            })
+        }
+    }
+    let element = canvas.addEl(data)
+    setTimeout(() => {
+        element.actions.default.backgroundColor = 'red'
+    }, 3000)
+</script>
+</body>
+</html>

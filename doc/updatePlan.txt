@@ -1,0 +1,101 @@
+2021-6-20
+    # 新增可视区概念,可视区内的元素才进行渲染
+    # 新增临时层，临时层的元素为一次性的，
+    # Scene
+        .contentBack => context
+        .contentFront => renderContext
+    # Element
+        动作渲染修改，通过配置的方式实现
+        例：{
+            type:'Rect',
+            actions:{
+                default:{} or defaultRenderCall
+                hover:{} or hoverRenderCall
+                click:{} or clickRenderCall
+                drag:{} or clickRenderCall
+            }
+        }
+    # Text
+        文本渲染位置问题
+        .fontSize int 12
+        .fontPosition string top|center|bottom
+    Message
+        .log
+        .info
+        .warn
+        .error
+
+2021-10-3
+# 新增demo页：
+    基础元素
+    样式
+    文字
+# 新增功能：
+    # 元素样式渲染规则：
+        # 1、元素设置样式和元素默认样式合并（default+set）
+        # 2、元素响应事件时样式合并
+        # 3、元素扩展渲染
+    # 元素事件新增transition（过渡）属性
+
+2021-10-31
+1、右键菜单
+    a、鼠标坐标转换
+    b、新增菜单类，通过数据生成
+    c、确定数据结构，支持多级菜单，单一菜单可禁用
+2、工具栏
+    a、支持基础功能：模式切换、放大、缩小、锁定图层、全视角、鸟瞰图、布局（左对齐、右对齐、上对齐、下对齐、横向对齐、纵向对齐）
+    b、可通过配置显示，可扩展
+3、动作响应
+    a、元素高亮样式（流动框）
+    #b、元素新增disabled，用于控制元素是否回调事件（disabled > can...）
+    #c、完善元素动作样式渲染合并规则
+#4、鼠标操作--框选模式SELECT（框选模式下，不能移动图层）
+    #a、新增临时层，放在element层之上，临时层的元素使用之后就删除
+    #b、元素新增canSelect和isSelect，用于框选模式选中，场景新增canSelect，isUseSelect（可外层配置，默认为true），MODE新增SELECT模式
+    #c、按下左Ctrl进入框选模式，画布要有消息提示，已进入框选模式，按左Ctrl退出，并在左下角有文字提示
+    #d、框选模式下，按下鼠标开始框选，将新增一个临时框选元素（有且只有一个）放入临时层
+    #e、当鼠标松开时，根据框选的范围，将element层被完全框选的元素的isSelect设置为true，并新增一个框选元素加入element层，大小由被框选元素决定（可以加入动效）
+    #f、element层的元素被框选将显示虚线外框
+    #g、element层的框选元素在场景中进行拖拽、移入、移出、点击以外的操作时，都将被删除，且只能存在一个，且当它被删除时，会将element层的所有元素的isSelect设置为false
+    #h、再次按下左Ctrl退出框选模式，先删除element层的框选元素，再将element层的所有元素的isSelect设置为false
+
+2021-11-8
+1、元素两两连线
+    -a、设置状态isLink，用于判断是否是连线中
+    -b、新增linkEl:{start,end,type}，包含start和end两个元素，以及元素类型（用于过滤指定元素）
+    -c、当进入isLink时（一般通过右键菜单功能），鼠标样式改为连线，当点击指定元素时，根据先后顺序，作为start和end，有且只有2个元素
+    -d、如果在操作过程中点击到非指定的元素，或者未点击到元素（触发noneClickCall时），都将退出连线操作
+    -e、点击到start后，会以start的center为起点，以鼠标位置为终点，生成一条直线，加入到临时层
+2、动作
+    #a、新增transition，可以配置元素在动作操作时的视觉过渡效果，使动作不那么生硬
+    #b、元素新增isTransition，用于控制是否启用过渡效果
+    -b、处理一个元素同时存在动作和动画效果
+    #c、当父元素进入drag动作时，可以配置某些子元素进入drag动作
+3、基本操作
+    -a、元素选中点击Delete可以删除，有确认框
+    #b、完善各种操作下的鼠标样式
+4、元素
+    #a、渲染图片和渲染背景要区分开，渲染图片在最上层
+    -b、元素背景的渐变色实现，且支持渐变色的动画
+    c、元素actions新增透明度：borderRadius
+    d、元素actions新增圆角：borderRadius
+    e、元素actions新增基于x轴旋转角度，圆心为元素的center
+    #f、otherRender辅助函数...
+    #g、元素可以通过编辑点调整大小
+    h、Circle元素单独实现点编辑
+5、动画
+    a、基于popmotion.js计算出动画的每一帧变化值，并支持不同的时间曲线
+    b、需要实现路径动画，路径动画可以分段进行...
+6、线元素
+    #a、实现直线的箭头
+    #b、线元素的箭头可以配置大小和样式（样式通过）
+    #c、计算出折线的拐点坐标，并实现拐点拖拽（基本实现...）
+    #d、修复折线元素showTestLine的轮廓
+    #f、折线拐点直接使用points时的bug
+7、场景
+    #a、全视角
+    #b、单点中心定位
+    #c、手动缩放
+    #d、layers删除元素增强
+    #e、计算整体元素边界bug
+    #f、使用isCanUseSelect时，没有进入框选模式需要加提示

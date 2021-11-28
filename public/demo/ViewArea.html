@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.css">
+    <title>性能测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+<div id="app" style="width:100vw;height: 100vh;background: aquamarine"></div>
+<!--<i class="fa fa-camera-retro fa-5x" id="text"></i>-->
+<script src="../ViewCanvas.js"></script>
+<script>
+    let VIEW = View;
+    let el = document.getElementById('app');
+    let canvas = new VIEW.Stage(el, {
+        config: {
+            // fps: 60,
+            mode: VIEW.MODE.EDIT
+        },
+        handler: {
+            otherRenderCall(e) {
+
+            },
+            clickCall(e, el) {
+                // console.log('left', el);
+            },
+            cancelCall(e, el) {
+                // console.log('cancel', el);
+            },
+            rightClickCall(e, el) {
+                // console.log('right', el)
+            },
+            centerClickCall(e, el) {
+                // console.log('center', el)
+            },
+            hoverCall(e, el) {
+                // console.log('hover', el);
+            },
+            leaveCall(e, el) {
+                // console.log('leaveCall', el);
+            },
+            dragStartCall(e, el) {
+                // console.log('dragStart', el);
+            },
+            dragCall(e, el) {
+                // console.log('drag', el);
+            },
+            dragEndCall(e) {
+                // console.log('dragEnd', e);
+            },
+            moveCall(e) {
+                // console.log('move', e);
+            },
+            zoomCall(e, flag) {
+                // console.log(flag);
+            }
+        }
+    })
+    let elements = []
+    for (let i = 0; i < 10000; i++) {
+        elements.push(
+            {
+                type: "Rect",
+                x: 10000 * Math.random(),
+                y: 5000 * Math.random(),
+                params: {
+                    width: 60,
+                    height: 60,
+                    r: 30,
+                    canDrag: false,
+                },
+                actions: {
+                    default: {
+                        backgroundColor: Math.random() > 0.5 ? 'red' : 'blue',
+                        // backgroundColor: 'black',
+                        fontIcon: '&#xf26e;',
+                        fontColor: 'yellow',
+                        fontSize: 40,
+                    }
+                },
+                animations: {
+                    backgroundColor: {process: {0: 'red', 100: 'blue'}, duration: 1},
+                    fontColor: {process: {0: 'yellow', 100: 'white'}, duration: 1},
+                }
+            })
+    }
+    elements.forEach(el => canvas.addEl(el));
+</script>
+</body>
+</html>
