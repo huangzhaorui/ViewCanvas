@@ -5,6 +5,7 @@ import Layer from "./Layer";
 import Base from "./Base";
 import '../common/Base.less';
 import View from '../main';
+import Tool from "./Tool";
 
 export default class Scene extends Base {
     constructor({parent, config, handler, name, zIndex}) {
@@ -153,7 +154,7 @@ export default class Scene extends Base {
         context.stroke()
         context.restore()
         const scale = this.zoomObj.curZoom / 10;
-        const fontText = `elements：${this.layers.element.elements.length}，x：${x1}，y：${y1}`
+        const fontText = `elements：${this.layers.element.elements.length}，x：${x1}，y：${y1}，scale：${this.zoomObj.curZoom}`
         new View.Elements.Text(
             context,
             x1 + 10 / scale,
@@ -171,7 +172,7 @@ export default class Scene extends Base {
         const {x1, y2} = this.viewArea;
         const {context, canSelect, isCanUseSelect} = this;
         if (!isCanUseSelect) return
-        let fontColor = '#2db7f5'
+        let fontColor = '#2d8cf0'
         let fontText = `按下左Ctrl进入框选模式`
         if (canSelect) {
             fontColor = '#ed4014'

@@ -76,7 +76,7 @@ export default class Element {
         this.canEdit = Tool.setDefaultValue(config.params.canEdit, true);//是否可通过编辑节点调整大小
         this.isHasAction = true;//是否有动作
         this.isSelect = false;//是否被框选
-        this.isTransition = Tool.setDefaultValue(config.params.isTransition, false);//是否使用过渡
+        this.isTransition = Tool.setDefaultValue(config.params.isTransition, true);//是否使用过渡
         this.imgRender = {};//图片渲染对象
         if (!!otherRender) this.otherRender = otherRender;//特殊渲染
         this.boundaries = [];//计算元素的矩形边界，4个点，左上，右上，右下，左下
@@ -177,12 +177,23 @@ export default class Element {
              * 过渡效果，通过transition属性实现
              */
             if (!this.isTransition) return;
-            let oldType = 'default'
-            if (type === 'isDrag' && this.isClick) oldType = 'click';
-            if (type === 'isHover' && this.isClick) return;
-            let style;
-            if (val) style = this.actionsParamsMerge(key.toLocaleLowerCase(), false)
-            else style = this.actionsParamsMerge(oldType, false)
+            let actionsKey = key.toLocaleLowerCase()
+            const {isHover, isClick, isDrag} = this;
+            const optionsKey = `${actionsKey}:${isHover - 0}-${isClick - 0}-${isDrag - 0}`
+            const optionsObj = {
+                'hover:0-0-0': 'default',
+                'hover:1-0-0': 'hover',
+                'hover:1-1-0': '',
+                'click:0-0-0': 'default',
+                'click:1-1-0': 'click',
+                'click:1-0-0': 'hover',
+                'drag:0-0-1': 'drag',
+                'drag:0-1-1': 'drag',
+                'drag:0-1-0': 'click',
+            }
+            const optionsType = optionsObj[optionsKey]
+            if (!optionsType) return;
+            let style = this.actionsParamsMerge(optionsType, false);
             //解析transition属性
             let transitionConfig = this.actions.transition
             let animations = {}
@@ -206,7 +217,8 @@ export default class Element {
                 if (canTransitionStyle.includes(k)) {
                     let v1 = this.style[k];
                     let v2 = style[k];
-                    if (Tool.checkNone(v1) && Tool.checkNone(v2) && v1 !== v2) {
+                    // if (Tool.judgeType(v1) || Tool.judgeType(v2)) continue;
+                    if (Tool.checkNone(v1) && Tool.checkNone(v2)) {
                         animations[k] = {process: {0: v1, 100: v2}, duration: transitionConfig[k], loop: false}
                     }
                 }
@@ -533,15 +545,13 @@ export default class Element {
     animationsRender() {
         for (const key in this.animations) {
             //动画执行完成后，将从执行动画列表中删除
-            if (!this.animations[key].isRender) {
-                this.removeAnimations(key)
-            } else {
+            if (this.animations[key].isRender) {
                 if (['x', 'y', 'width', 'height', 'r'].includes(key)) {//针对x、y、width、height、r
                     this[key] = this.animations[key].render(this[key]);
                     if (!!this.judgeBoundaries) this.judgeBoundaries();
                 } else {//针对style属性
                     this.actions.change[key] = this.animations[key].render(this.actions.change[key]);
-                    this.isHasAction = true;
+                    this.style[key] = this.actions.change[key];
                 }
             }
         }

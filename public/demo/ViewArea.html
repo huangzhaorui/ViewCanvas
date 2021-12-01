@@ -24,7 +24,8 @@
     let canvas = new VIEW.Stage(el, {
         config: {
             // fps: 60,
-            mode: VIEW.MODE.EDIT
+            mode: VIEW.MODE.EDIT,
+            min_scale: 3,
         },
         handler: {
             otherRenderCall(e) {
@@ -88,8 +89,8 @@
                     }
                 },
                 animations: {
-                    backgroundColor: {process: {0: 'red', 100: 'blue'}, duration: 1},
-                    fontColor: {process: {0: 'yellow', 100: 'white'}, duration: 1},
+                    // backgroundColor: {process: {0: 'red', 100: 'blue'}, duration: 1},
+                    // fontColor: {process: {0: 'yellow', 100: 'white'}, duration: 1},
                 }
             })
     }

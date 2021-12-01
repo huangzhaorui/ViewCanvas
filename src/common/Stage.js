@@ -21,14 +21,14 @@ export default class Stage {
     //事件监听
     eventListener() {
         let vm = this;
-        this.resize = () => {
+        let resize = () => {
             vm.sceneList.forEach(s => {
                 if (s.isResize) s.resizeView();
             })
         }
         // 父元素大小改变时，自动调整canvas大小
-        const resizeObserver = new ResizeObserver(this.resize);
-        resizeObserver.observe(this.parent);
+        this.resizeObserver = new ResizeObserver(resize);
+        this.resizeObserver.observe(this.parent);
         // window.addEventListener('resize', this.resize)
     }
 
@@ -95,6 +95,8 @@ export default class Stage {
             let id = el.destroyScene();
             delete View.SCENE_LIST[id];
         })
+        this.resizeObserver.unobserve(this.parent);
+        this.resizeObserver = null;
         this.sceneList = [];
         this.parent.innerHTML = '';
         // window.removeEventListener('resize', this.resize)
