@@ -1,0 +1,7 @@
+{
+  "default": {
+    "backgroundColor": "transparent",
+    "fontText": "请输入...",
+    "fontColor": "black"
+  }
+}

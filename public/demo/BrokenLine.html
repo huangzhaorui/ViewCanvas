@@ -33,14 +33,14 @@
             },
             clickCall(e, el) {
                 // if (el.type === 'BrokenLine') {
-                el.showEditPoint()
+                // el.showEditPoint()
                 // el.showTestLine = true
                 // }
                 console.log('left', el);
             },
             cancelCall(e, el) {
                 // if (el.type === 'BrokenLine') {
-                el.clearEditPoint()
+                // el.clearEditPoint()
                 // el.showTestLine = false
                 // }
                 // console.log('cancel', el);
@@ -84,7 +84,8 @@
             y: 200,
             params: {
                 width: 200,
-                height: 400
+                height: 400,
+                disabled: true,
             },
             actions: {
                 default: {
@@ -99,14 +100,14 @@
                     params: {
                         width: 180,
                         height: 400,
-                        isTransition: false,
                     },
                     actions: {
                         default: {
-                            backgroundColor: {
-                                type: 'Linear',
-                                colors: [['white', 0], ['black', 0.5], ['white', 1]]
-                            },
+                            // backgroundColor: {
+                            //     type: 'Linear',
+                            //     colors: [['white', 0], ['black', 0.5], ['white', 1]]
+                            // },
+                            backgroundColor: 'green',
                             fontText: '田田田',
                             fontSize: 40,
                             fontColor: 'white',
@@ -182,17 +183,23 @@
                         // canDrag: false,
                         // canHover: false,
                         // canClick: false,
-                        width: 180,
-                        height: 400
+                        width: '100%-20',
+                        height: '100%'
                     },
                     actions: {
                         default: {
                             backgroundColor: '#67C23A',
                             fontText: '田田\r\n田田田\r\n田田田\r\n田田',
+                            // fontText: '田田',
                             fontSize: 20,
                             fontColor: "red",
                             fontPosition: 'center',
-                            imgUrl: 'https://tse1-mm.cn.bing.net/th/id/R-C.728d1bd929f70ac36b6a0c41f66649f3?rik=K%2fUy9J2nl3HwvA&riu=http%3a%2f%2fimg95.699pic.com%2felement%2f40091%2f4992.png_300.png&ehk=7FPoRCr3wAXJMK2mITZfddPGDZt8pHZiiKlaLrdk%2fjw%3d&risl=&pid=ImgRaw&r=0'
+                            imgUrl: 'https://tse1-mm.cn.bing.net/th/id/R-C.728d1bd929f70ac36b6a0c41f66649f3?rik=K%2fUy9J2nl3HwvA&riu=http%3a%2f%2fimg95.699pic.com%2felement%2f40091%2f4992.png_300.png&ehk=7FPoRCr3wAXJMK2mITZfddPGDZt8pHZiiKlaLrdk%2fjw%3d&risl=&pid=ImgRaw&r=0',
+                            borderSize: 1,
+                            borderType: 'solid',
+                            borderDashedSpace: 30,
+                            fontOffsetX: 100,
+                            fontOffsetY: 20
                         }
                     },
                     animations: {
@@ -215,7 +222,7 @@
                 },
                 {
                     type: 'Circle',
-                    x: 190,
+                    x: '100%-10',
                     y: 10,
                     params: {
                         r: 5
@@ -234,7 +241,7 @@
     let els = canvas.currentScene.layers.element.elements;
     // console.log(els)
     let line = {
-        type: 'StraightLine',
+        type: 'BrokenLine',
         params: {
             // showTestLine: true,
             start: els[0].children[2],

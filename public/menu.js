@@ -18,5 +18,17 @@ const menuList = [
     {
         name: "编辑元素",
         url: "demo/EditElement.html"
+    },
+    {
+        name: "文本框",
+        url: "demo/InputDemo.html"
+    },
+    {
+        name: "旋转",
+        url: "demo/RotateDemo.html"
+    },
+    {
+        name: "编辑器",
+        url: "demo/Editor.html"
     }
 ]

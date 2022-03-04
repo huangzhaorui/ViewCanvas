@@ -9,6 +9,7 @@ import EditPoint from './common/EditPoint';
 import Other from './common/Other';
 import Container from "./common/Container";
 import SelectBorder from "./common/SelectBorder";
+import Input from './common/Input';
 //辅助元素
 import Img from './common/Img'
 
@@ -22,6 +23,7 @@ const Elements = {
     SelectBorder,
     Other,
     Container,
+    Input,
     Img
 }
 export default Elements

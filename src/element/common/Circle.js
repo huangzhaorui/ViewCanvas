@@ -10,7 +10,8 @@ export default class Circle extends Element {
         this.r = r;
         this.start = start;
         this.end = end;
-        this.judgeBoundaries();
+        //如果有父节点，则不渲染子节点边界
+        if (!this.parent) this.judgeBoundaries();
     }
 
     //路径渲染
@@ -26,16 +27,6 @@ export default class Circle extends Element {
         this.drawImgByCircle({context, x, y, r, url})
     }
 
-    //扩展渲染
-    preRender(context) {
-        context.save();
-        let {x, y, style} = this
-        //是否进行文字渲染
-        if (style.fontIcon || style.fontText)
-            new View.Elements.Text(context, x, y, style)
-        context.restore();
-    }
-
     //计算边界
     judgeBoundaries() {
         let {x, y, r} = this;
@@ -44,8 +35,6 @@ export default class Circle extends Element {
         x2 = x + r * 2;//右x
         y1 = y;//上y
         y2 = y + r * 2;//下y
-        this.boundaries = [[x1, y1], [x2, y1], [x2, y2], [x1, y2]]
-        this.center.x = (x1 + x2) / 2
-        this.center.y = (y1 + y2) / 2
+        this.setBoundaries(x1, x2, y1, y2);
     }
 }

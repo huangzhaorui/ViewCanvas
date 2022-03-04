@@ -2,6 +2,7 @@
     编辑端点
 */
 import Circle from "./Circle";
+import View from "../../main";
 
 export default class EditPoint extends Circle {
     constructor(config) {
@@ -18,5 +19,15 @@ export default class EditPoint extends Circle {
             num++
         }
         return num
+    }
+
+    relationChange(el, e) {
+        const {offsetX, offsetY} = e;
+        let {scale, sceneId} = this;
+        let mouseDownPosition = View.SCENE_LIST[sceneId].mouseOldPosition;
+        let mX = (offsetX - mouseDownPosition.offsetX) / scale
+        let mY = (offsetY - mouseDownPosition.offsetY) / scale
+        this.x += mX;
+        this.y += mY;
     }
 }

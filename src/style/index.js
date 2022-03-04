@@ -7,6 +7,7 @@ import StraightLine from "./common/StraightLine.json"
 import BrokenLine from "./common/BrokenLine.json"
 import EditPoint from "./common/EditPoint.json"
 import SelectBorder from "./common/SelectBorder.json";
+import Input from "./common/Input.json";
 
 const Style = {
     Element,
@@ -17,6 +18,7 @@ const Style = {
     BrokenLine,
     Text,
     EditPoint,
-    SelectBorder
+    SelectBorder,
+    Input
 }
 export default Style

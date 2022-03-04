@@ -2,6 +2,7 @@
     文本
 */
 import View from '../../main';
+import Tool from "../../common/Tool";
 
 export default class Text {
     constructor(context, x, y, style, boundaries) {
@@ -35,7 +36,11 @@ export default class Text {
             fontClass,//字体图标类名
             fontText,//文本内容
             fontAlign,
+            fontOffsetX,
+            fontOffsetY
         } = this.style;
+        fontOffsetX = Tool.judgeType(fontOffsetX, 1) ? fontOffsetX : 0;
+        fontOffsetY = Tool.judgeType(fontOffsetY, 1) ? fontOffsetY : 0;
         context.save()
         context.fillStyle = fontColor;
         /**
@@ -47,7 +52,7 @@ export default class Text {
             let {x, y} = this;
             fontClass = 'FontAwesome';
             context.font = `${fontSize}px ${fontClass}`;
-            context.fillText(this.createFontIcon(fontIcon), x, y);
+            context.fillText(this.createFontIcon(fontIcon), x + fontOffsetX, y + fontOffsetY);
         }
         if (!fontIcon && !!fontText) {
             context.textBaseline = 'middle';//垂直对齐方式
@@ -60,40 +65,40 @@ export default class Text {
                 const textList = fontText.split('\r\n');
                 if (position === 'top') {//文字在顶部
                     textList.forEach((t, i) => {
-                        context.fillText(t, x, y - (textList.length - 0.5 - i) * fontSize + fontHeight / 2);
+                        context.fillText(t, x + fontOffsetX, y - (textList.length - 0.5 - i) * fontSize + fontHeight / 2 + fontOffsetY);
                     })
                 } else if (position === 'bottom') {//文字在中间或底部
                     textList.forEach((t, i) => {
-                        context.fillText(t, x, y + (i + 0.5) * fontSize + fontHeight / 2);
+                        context.fillText(t, x + fontOffsetX, y + (i + 0.5) * fontSize + fontHeight / 2 + fontOffsetY);
                     })
                 } else {//文字在中间
                     if (textList.length % 2 === 0) {//偶数
                         let centerIndex = textList.length / 2
                         textList.forEach((t, i) => {
                             if (i === centerIndex) {
-                                context.fillText(t, x, y + 0.5 * fontSize + fontHeight / 2);
+                                context.fillText(t, x + fontOffsetX, y + 0.5 * fontSize + fontHeight / 2 + fontOffsetY);
                             } else {
-                                context.fillText(t, x, y - (centerIndex - i - 0.5) * fontSize + fontHeight / 2);
+                                context.fillText(t, x + fontOffsetX, y - (centerIndex - i - 0.5) * fontSize + fontHeight / 2 + fontOffsetY);
                             }
                         })
                     } else {//奇数
                         let centerIndex = Math.floor(textList.length / 2)
                         textList.forEach((t, i) => {
                             if (i === centerIndex) {
-                                context.fillText(t, x, y + fontHeight / 2);
+                                context.fillText(t, x + fontOffsetX, y + fontHeight / 2 + fontOffsetY);
                             } else {
-                                context.fillText(t, x, y - (centerIndex - i) * fontSize + fontHeight / 2);
+                                context.fillText(t, x + fontOffsetX, y - (centerIndex - i) * fontSize + fontHeight / 2 + fontOffsetY);
                             }
                         })
                     }
                 }
             } else {
                 if (position === 'top') {//文字在顶部
-                    context.fillText(fontText, x, y - fontSize / 2);
+                    context.fillText(fontText, x + fontOffsetX, y - fontSize / 2 + fontOffsetY);
                 } else if (position === 'bottom') {//文字在中间或底部
-                    context.fillText(fontText, x, y + fontHeight + fontSize / 2);
+                    context.fillText(fontText, x + fontOffsetX, y + fontHeight + fontSize / 2 + fontOffsetY);
                 } else {//文字在中间
-                    context.fillText(fontText, x, y + fontHeight / 2);
+                    context.fillText(fontText, x + fontOffsetX, y + fontHeight / 2 + fontOffsetY);
                 }
             }
         }

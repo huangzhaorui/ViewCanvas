@@ -9,13 +9,14 @@ import Gradient from "../element/common/Gradient";
 
 export default class Element {
     constructor(config) {
-        let {id, sceneId, x, y, zIndex, type, actions = {}, otherRender, animations = {}, parent, data} = config;//基础配置
+        let {id, sceneId, layer, x, y, zIndex, type, actions = {}, otherRender, animations = {}, parent, data} = config;//基础配置
         if (config.params === undefined) config.params = {};
         this.CONFIG = config;//图形配置项
         this.id = id;
         if (Tool.judgeType(data)) this.data = JSON.parse(JSON.stringify(data))
         this.parent = parent;
         this.sceneId = sceneId;
+        this.layer = layer;
         this.type = type;//元素类型
         this.x = x || 0;
         this.y = y || 0;
@@ -28,6 +29,8 @@ export default class Element {
              * 基础
              * backgroundColor：String
              * imgUrl：String
+             * rotate：Number
+             * alpha: Number
              */
             /**
              * 文字：
@@ -36,13 +39,17 @@ export default class Element {
              * fontClass：String
              * fontSize：Number
              * fontColor：String
+             * fontAlign: left | center | right
              * fontPosition：top | center | bottom
+             * fontOffsetX：Number
+             * fontOffsetY：Number
              */
             /**
              * 边框：
              * borderSize：Number
              * borderColor：String
-             * borderType
+             * borderType：solid | dashed
+             * borderDashedSpace：Number
              */
             /**
              * 阴影
@@ -54,9 +61,9 @@ export default class Element {
             /**
              * 线段
              * lineWidth：Number,
-             *lineColor：String,
-             *lineDash：Array<Number>,
-             *lineCap：round | butt,
+             * lineColor：String,
+             * lineDash：Array<Number>,
+             * lineCap：round | butt,
              */
             /**
              * 箭头
@@ -69,6 +76,7 @@ export default class Element {
         this.scale = 1;//缩放层级
         this.canRender = true;//是否可渲染
         this.disabled = Tool.setDefaultValue(config.params.disabled, false);//是否禁用动作
+        this.canEvent = Tool.setDefaultValue(config.params.canEvent, true);//是否响应事件
         this.canHover = Tool.setDefaultValue(config.params.canHover, true);//是否响应移入
         this.canClick = Tool.setDefaultValue(config.params.canClick, true);//是否响应点击
         this.canDrag = Tool.setDefaultValue(config.params.canDrag, true);//是否响应推拽
@@ -80,11 +88,14 @@ export default class Element {
         this.imgRender = {};//图片渲染对象
         if (!!otherRender) this.otherRender = otherRender;//特殊渲染
         this.boundaries = [];//计算元素的矩形边界，4个点，左上，右上，右下，左下
-        this.center = {x: 0, y: 0};//中心点
+        this.defaultBoundaries = [];//默认的元素矩形边界(保留元素未旋转前的边界点)
+        this.center = {x: 0, y: 0, rotate: 0};//元素中心点
+        this.rotateCenter = Tool.setDefaultValue(config.params.rotateCenter, null);//旋转中心点
         this.relationEl = {};//关联元素列表，改变元素x，y时，若存在关联元素，将调用关联元素relationChange方法
         this.feedbackCall = null;//反馈回调，如当拖拽导致元素x，y改变时触发
         this.actionRenderCall = null;//触发自定义动作渲染
-        this.showTestLine = config.params.showTestLine || false;//辅助测试线框
+        this.showTestLine = Tool.setDefaultValue(config.params.showTestLine, false);//辅助测试线框
+        this.showTestBoundariesPoint = Tool.setDefaultValue(config.params.showTestBoundariesPoint, false);//辅助测试边界点
         this.cursorStyle = Tool.setDefaultValue(config.params.cursorStyle, '');//元素鼠标样式
         this.isShowEditPoint = Tool.setDefaultValue(config.params.isShowEditPoint, false);//是否显示拖拽节点
         this.editPoints = []
@@ -145,6 +156,13 @@ export default class Element {
         this.oX = oX;
         this.oY = oY;
         context.save();
+        //禁用动作后，设置透明度
+        if (this.disabled) context.globalAlpha = 0.5;
+        //透明度设置
+        this.setAlpha(context);
+        //旋转设置
+        this.setRotate(context);
+        context.save();
         //当有动作变化时，调用动作渲染
         if (this.isHasAction) this.optionRender(context);
         this.setShadow(context)
@@ -162,6 +180,8 @@ export default class Element {
         if (!!this.childrenRender) this.childrenRender(context)
         //边界渲染（线段类有单独的方法）
         if (!['BrokenLine', 'StraightLine'].includes(this.type) && !!this.showTestLine) this.selectRender(context, 'black', false)
+        context.restore();
+        if (this.showTestBoundariesPoint) this.showBoundariesPoint(context);
     }
 
     //动作触发
@@ -173,11 +193,12 @@ export default class Element {
             // console.log(key, val)
             this.isHasAction = true
             this[`_${type}_`] = val
+            let actionsKey = key.toLocaleLowerCase()
+            if (!!this.eventCall) this.eventCall(actionsKey, val);
             /**
              * 过渡效果，通过transition属性实现
              */
             if (!this.isTransition) return;
-            let actionsKey = key.toLocaleLowerCase()
             const {isHover, isClick, isDrag} = this;
             const optionsKey = `${actionsKey}:${isHover - 0}-${isClick - 0}-${isDrag - 0}`
             const optionsObj = {
@@ -200,6 +221,8 @@ export default class Element {
             //可以过渡的样式属性
             const canTransitionStyle = [
                 'backgroundColor',
+                'rotate',
+                'alpha',
                 'fontSize',
                 'fontColor',
                 'borderSize',
@@ -240,6 +263,8 @@ export default class Element {
         for (const key in this.actions) {
             Tool.observe(this.actions[key], () => this.isHasAction = true)
         }
+        //初始化style
+        this.actionRender(View.SCENE_LIST[this.sceneId].context);
     }
 
     //操作状态渲染
@@ -268,11 +293,6 @@ export default class Element {
         if (!!style) this.style = style
         if (!!this[type + 'Render']) this[type + 'Render'](context)
         this.isHasAction = false
-        // let {backgroundColor} = this.style;
-        // if (['transparent'].includes(backgroundColor)) return
-        // let color = Tool.getColor(backgroundColor);
-        // color.a = .5;
-        // context.fillStyle = Tool.setColor(color)
     }
 
     //动作合并
@@ -297,6 +317,27 @@ export default class Element {
             return Tool.paramsMerge(actions.default, actions[type], flag ? actions.change : {})
         }
     }
+
+    //设置透明度
+    setAlpha(context) {
+        if (Tool.checkNone(this.style.alpha)) {
+            context.globalAlpha = this.style.alpha;
+        }
+    }
+
+    //设置旋转
+    setRotate(context) {
+        let center;
+        this.center.rotate = this.style.rotate;
+        if (this.rotateCenter) center = {...this.rotateCenter};
+        else center = {...this.center};
+        if (!(['', undefined, null].includes(center.rotate) || center.rotate % 360 === 0)) {
+            context.translate(center.x, center.y);
+            context.rotate(Math.PI / 180 * center.rotate);
+            context.translate(-center.x, -center.y);
+        }
+    }
+
 
     //设置shadow
     setShadow(context) {
@@ -384,7 +425,7 @@ export default class Element {
 
     //边框渲染
     selectRender(context, color = 'blue', flag = true) {
-        const {boundaries} = this;
+        const {defaultBoundaries: boundaries} = this;
         if (boundaries.length === 0) return
         context.beginPath();
         context.save()
@@ -397,6 +438,17 @@ export default class Element {
         context.rect(x, y, width, height);
         context.stroke();
         context.restore();
+    }
+
+    //查看边界点
+    showBoundariesPoint(context) {
+        this.boundaries.forEach((p, i) => {
+            let r = 8;
+            context.beginPath();
+            context.arc(p[0], p[1], r, 0, Math.PI * 2);
+            context.stroke();
+            new View.Elements.Text(context, p[0], p[1], {fontText: i + ''});
+        })
     }
 
     //设置编辑节点
@@ -417,6 +469,7 @@ export default class Element {
                 position
             })
             point.feedbackCall = this.pointFeedBack.bind(this)
+            this.relationEl[point.id] = point;
             return point
         })
     }
@@ -427,13 +480,14 @@ export default class Element {
         this.showTestLine = false;
         if (this.editPoints.length) {
             View.SCENE_LIST[this.sceneId].remove(this.editPoints)
-            this.editPoints = []
+            this.editPoints = [];
+            this.relationEl = {};
         }
     }
 
     //获取编辑点坐标
     getEditPointsPosition() {
-        let {boundaries, editPointsR} = this;
+        let {defaultBoundaries: boundaries, editPointsR} = this;
         let p1 = boundaries[0];
         let p2 = boundaries[1];
         let p3 = boundaries[2];
@@ -492,7 +546,7 @@ export default class Element {
 
     //文字渲染
     textRender(context) {
-        let {center, boundaries, style} = this
+        let {center, defaultBoundaries: boundaries, style} = this
         if (style.fontIcon || style.fontText) {
             let fontX = center.x;
             let fontY = center.y;
@@ -506,6 +560,12 @@ export default class Element {
         if (Tool.judgeType(style.borderSize, 1) && style.borderSize) {
             context.save();
             context.beginPath();
+            //设置虚线
+            if (style.borderType === 'dashed') {
+                let space = 5;
+                if (Tool.judgeType(style.borderDashedSpace, 1)) space = style.borderDashedSpace
+                context.setLineDash([space, space, space]);
+            }
             context.strokeStyle = style.borderColor || 'black';
             context.lineWidth = style.borderSize;
             this.pathRender(context);
@@ -552,6 +612,9 @@ export default class Element {
                 } else {//针对style属性
                     this.actions.change[key] = this.animations[key].render(this.actions.change[key]);
                     this.style[key] = this.actions.change[key];
+                    if (['rotate'].includes(key)) {
+                        if (!!this.judgeBoundaries) this.judgeBoundaries();
+                    }
                 }
             }
         }
@@ -591,12 +654,51 @@ export default class Element {
         this.animations = {}
     }
 
+    //设置元素边界
+    setBoundaries(x1, x2, y1, y2) {
+        this.defaultBoundaries = [[x1, y1], [x2, y1], [x2, y2], [x1, y2]];
+        this.center.x = (x1 + x2) / 2;
+        this.center.y = (y1 + y2) / 2;
+        let rotate = this.style.rotate;
+        if (["", undefined, null].includes(rotate) || rotate % 360 === 0) {
+            this.boundaries = [[x1, y1], [x2, y1], [x2, y2], [x1, y2]];
+        } else {
+            let {center, defaultBoundaries} = this;
+            let r = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2)) / 2;
+            this.boundaries = defaultBoundaries.map((p, i) => {
+                let data = {x: p[0], y: p[1]};
+                let a = Tool.judgeAngle(center, data)
+                switch (i) {
+                    case 0:
+                        a += 90;
+                        break;
+                    case 1:
+                        a += 270;
+                        break;
+                    case 2:
+                        a += 270;
+                        break;
+                    case 3:
+                        a += 90;
+                        break;
+                }
+                a += rotate;
+                let point = Tool.judgeXY(-a % 360, center, r);
+                return [point.x, point.y]
+            })
+        }
+    }
+
     //判断点是否在范围内
     judgeValueIsInRange(e, context) {
         const {offsetX, offsetY} = e;
         if (!!this.pathRender) {
+            context.save();
+            //旋转设置
+            this.setRotate(context);
             context.beginPath();
             this.pathRender(context);
+            context.restore();
         }
         return context.isPointInPath(offsetX, offsetY);
     }
@@ -605,7 +707,7 @@ export default class Element {
     elOffset(e) {
         if (this.disabled) return
         if (this.canDrag) {
-            this.clearEditPoint()//清空编辑点
+            // this.clearEditPoint()//清空编辑点
             const {offsetX, offsetY} = e;
             let {scale, sceneId} = this;
             let mouseDownPosition = View.SCENE_LIST[sceneId].mouseOldPosition;
@@ -633,7 +735,7 @@ export default class Element {
     //通过元素边界判断是否在场景可视区内
     judgeIsInSceneViewArea() {
         const {x1, x2, y1, y2} = View.SCENE_LIST[this.sceneId].viewArea;
-        const {boundaries} = this;
+        const {defaultBoundaries: boundaries} = this;
         if (boundaries.length !== 4) return
         //用左上角和右下角进行是否存在可视区检测
         this.canRender = x1 <= boundaries[2][0] && y1 <= boundaries[2][1] && x2 >= boundaries[0][0] && y2 >= boundaries[0][1];
@@ -641,5 +743,10 @@ export default class Element {
 
     destroy() {
 
+    }
+
+    setActions(key, value, type = 'default') {
+        this.actions[type][key] = value;
+        this.actions.change[key] = value;
     }
 }

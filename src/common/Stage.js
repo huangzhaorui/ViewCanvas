@@ -8,6 +8,8 @@ export default class Stage {
     constructor(el, params) {
         console.warn('view-----start');
         this.parent = el;//父节点
+        el.style.position = 'relative';
+        el.style.overflow = 'hidden';
         this.params = params;//配置和事件监听
         this.sceneList = [];
         this.currentScene = null;//默认场景
@@ -87,6 +89,12 @@ export default class Stage {
     addEl(el, layer = 'element', scene = 'currentScene') {
         let elConfig = {...el};
         return this[scene].add(elConfig, layer);
+    }
+
+    //删除场景元素
+    removeEl(el) {
+        let {sceneId} = el;
+        View.SCENE_LIST[sceneId].remove(el);
     }
 
     //清空舞台

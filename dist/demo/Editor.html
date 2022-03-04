@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.css">
+    <title>编辑器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .box {
+            box-shadow: 0 0 10px rgba(0, 0, 0, .5);
+            overflow-y: auto;
+        }
+
+        .title {
+            text-align: left;
+            padding: 10px 0 10px 20px;
+            margin-bottom: 10px;
+            color: white;
+            font-size: 14px;
+            text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+            background: -webkit-linear-gradient(left top, #2db7f5, #17233d);
+            box-shadow: 0 0 10px inset rgba(255, 255, 255, .5);
+        }
+
+        .controlBox {
+            padding: 0 10px 0;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .control {
+            width: 100px;
+            height: 100px;
+            text-align: center;
+            line-height: 100px;
+            margin: 0 10px 10px 0;
+            background: rgba(255, 255, 255, .5);
+            box-shadow: 0 0 10px inset rgba(0, 0, 0, .5);
+            transition: box-shadow .3s;
+        }
+
+        .control:hover {
+            cursor: pointer;
+            box-shadow: 0 0 20px inset rgba(0, 0, 0, .5);
+        }
+
+        .control:nth-child(3n) {
+            margin-right: 0;
+        }
+
+        .paramRow {
+            width: 90%;
+            text-align: right;
+            margin-bottom: 10px;
+        }
+
+        .paramRow > label {
+            font-size: 16px;
+        }
+
+        .paramRow > input {
+            width: 200px;
+            height: 22px;
+        }
+
+        .paramRow > select {
+            width: 200px;
+            height: 22px;
+        }
+    </style>
+</head>
+<body>
+<div style="width:calc(100% - 20px);height: calc(100vh - 20px);display: flex;padding: 10px">
+    <div id="left" class="box" style="width: 340px;">
+        <p class="title">控件</p>
+        <div class="controlBox">
+            <div class="control" draggable="true">矩形</div>
+        </div>
+    </div>
+    <div id="app" class="box" style="width:calc(100% - 20px - 680px);margin:0 10px;height: 100%;"></div>
+    <div id="right" class="box" style="width: 340px">
+        <p class="title">基本参数</p>
+        <!--        <p class="paramRow">-->
+        <!--            <label for="x">x坐标：</label>-->
+        <!--            <input id="x" type="number">-->
+        <!--        </p>-->
+        <!--        <p class="paramRow">-->
+        <!--            <label for="y">y坐标：</label>-->
+        <!--            <input id="y" type="number">-->
+        <!--        </p>-->
+        <p class="paramRow">
+            <label for="width">长度：</label>
+            <input id="width" type="number">
+        </p>
+        <p class="paramRow">
+            <label for="height">宽度：</label>
+            <input id="height" type="number">
+        </p>
+        <p class="paramRow">
+            <label for="rotate">旋转角度：</label>
+            <input id="rotate" type="number">
+        </p>
+        <p class="title">样式参数</p>
+        <p class="paramRow">
+            <label for="backgroundColor">背景色：</label>
+            <input id="backgroundColor" type="color">
+        </p>
+        <p class="paramRow">
+            <label for="fontText">文本内容：</label>
+            <input id="fontText" type="text">
+        </p>
+        <p class="paramRow">
+            <label for="fontSize">文本大小：</label>
+            <input id="fontSize" type="number">
+        </p>
+        <p class="paramRow">
+            <label for="fontColor">文本颜色：</label>
+            <input id="fontColor" type="color">
+        </p>
+        <p class="paramRow">
+            <label for="fontAlign">对齐方式：</label>
+            <select id="fontAlign">
+                <option value="left">左边</option>
+                <option value="center">正中</option>
+                <option value="right">右边</option>
+            </select>
+        </p>
+        <p class="paramRow">
+            <label for="fontPosition">文本位置：</label>
+            <select id="fontPosition">
+                <option value="top">居于顶部</option>
+                <option value="center">居于正中</option>
+                <option value="bottom">居于底部</option>
+            </select>
+        </p>
+        <p class="paramRow">
+            <label for="fontOffsetX">文本偏移x：</label>
+            <input id="fontOffsetX" type="number">
+        </p>
+        <p class="paramRow">
+            <label for="fontOffsetY">文本偏移y：</label>
+            <input id="fontOffsetY" type="number">
+        </p>
+        <p class="paramRow">
+            <label for="borderSize">边框大小：</label>
+            <input id="borderSize" type="number">
+        </p>
+        <p class="paramRow">
+            <label for="borderColor">边框颜色：</label>
+            <input id="borderColor" type="color">
+        </p>
+        <p class="paramRow">
+            <label for="borderType">边框类型：</label>
+            <select id="borderType">
+                <option value="solid">实线</option>
+                <option value="dashed">虚线</option>
+            </select>
+        </p>
+        <p class="paramRow">
+            <label for="borderDashedSpace">虚线间隔：</label>
+            <input id="borderDashedSpace" type="number">
+        </p>
+    </div>
+</div>
+
+<!--<i class="fa fa-camera-retro fa-5x" id="text"></i>-->
+<script src="../ViewCanvas.js"></script>
+<script>
+    const VIEW = View;
+    const TYPES = {
+        '矩形': {
+            type: "Rect",
+            params: {width: 100, height: 100},
+            actions: {
+                default: {
+                    backgroundColor: 'transparent',
+                    borderSize: 1,
+                    borderColor: 'red',
+                    // fontPosition: 'bottom'
+                }
+            }
+        }
+    }
+    const BASE_PARAMS = ['width', 'height'];
+    const STYLE_PARAMS = ['rotate', 'backgroundColor', 'fontText', 'fontSize', 'fontColor', 'fontAlign', 'fontPosition', 'fontOffsetX', 'fontOffsetY', 'borderSize', 'borderColor', 'borderType', 'borderDashedSpace'];
+    BASE_PARAMS.forEach(id => document.getElementById(id).oninput = changeValue)
+    STYLE_PARAMS.forEach(id => document.getElementById(id).oninput = changeStyleValue)
+    let selectElement = null;
+    let el = document.getElementById('app');
+    let canvas = new VIEW.Stage(el, {
+        config: {
+            // fps: 60,
+            mode: VIEW.MODE.EDIT
+        },
+        handler: {
+            otherRenderCall(e) {
+
+            },
+            clickCall(e, el) {
+                setValue(el);
+            },
+            cancelCall(e, el) {
+                cancelValue();
+                // console.log('cancel', el);
+            },
+            rightClickCall(e, el) {
+                // console.log('right', el)
+            },
+            centerClickCall(e, el) {
+                // console.log('center', el)
+            },
+            hoverCall(e, el) {
+                // console.log('hover', el);
+            },
+            leaveCall(e, el) {
+                // console.log('leaveCall', el);
+            },
+            dragStartCall(e, el) {
+                // console.log('dragStart', el);
+            },
+            dragCall(e, el) {
+                // console.log('drag', el);
+            },
+            dragEndCall(e) {
+                // console.log('dragEnd', e);
+            },
+            moveCall(e) {
+                // console.log('move', e);
+            },
+            zoomCall(e, flag) {
+                // console.log(flag);
+            }
+        }
+    })
+    canvas.currentScene.canvasFront.ondrop = drop;
+    canvas.currentScene.canvasFront.ondragover = allowDrop;
+    let elList = document.getElementsByClassName('control');
+    for (let i = 0; i < elList.length; i++) {
+        elList[i].ondragstart = ondragstart;
+    }
+
+    function ondragstart(e) {
+        e.dataTransfer.setData("type", e.target.innerHTML);
+    }
+
+    function drop(e) {
+        e.preventDefault();
+        let type = e.dataTransfer.getData("type");
+        let {offsetX: x, offsetY: y} = e;
+        let {zoomObj, offsetX: oX, offsetY: oY} = canvas.currentScene;
+        let scale = zoomObj.curZoom / 10
+        x = (x - oX) / scale
+        y = (y - oY) / scale;
+        let config = {...TYPES[type], x, y};
+        render(config);
+    }
+
+    function allowDrop(e) {
+        e.preventDefault();
+    }
+
+    function render(config) {
+        canvas.addEl(config)
+    }
+
+    function setValue(el) {
+        selectElement = el
+        BASE_PARAMS.forEach(key => {
+            document.getElementById(key).value = el[key]
+
+        })
+        STYLE_PARAMS.forEach(key => {
+            let d = document.getElementById(key)
+            if (d.tagName === 'SELECT') {
+                for (let i = 0; i < d.children.length; i++) {
+                    if (d.children[i].value === el.style[key]) {
+                        d.children[i].selected = true
+                    } else {
+                        d.children[i].selected = false
+                    }
+                }
+            } else if (d.tagName === 'INPUT') {
+                if (d.type === 'number') {
+                    d.value = el.style[key] ? el.style[key] * 1 : 0
+                } else if (d.type === 'text') {
+                    d.value = el.style[key]
+                } else if (d.type === 'color') {
+
+                    if (el.style[key]) {
+                        let {r, g, b, a} = View.Tool.getColor(el.style[key])
+                        let r16 = new Number(r).toString(16);
+                        let g16 = new Number(g).toString(16);
+                        let b16 = new Number(b).toString(16);
+                        let a16 = new Number(a).toString(16);
+                        if (r16.length === 1) r16 = 0 + r16;
+                        if (g16.length === 1) g16 = 0 + g16;
+                        if (b16.length === 1) b16 = 0 + b16;
+                        if (a16.length === 1) a16 = 0 + a16;
+                        console.log(`#${r16}${g16}${b16}`)
+                        d.value = `#${r16}${g16}${b16}`
+                    } else {
+                        d.value = '#000000'
+                    }
+                }
+            }
+        })
+    }
+
+    function cancelValue() {
+        selectElement = null;
+    }
+
+    function changeValue(e) {
+        let key = e.target.id
+        let value = e.target.value
+        let type = e.target.type
+        if (type === 'number') value = value ? value * 1 : 0
+        console.log(value, type)
+        if (selectElement) selectElement[key] = value
+    }
+
+    function changeStyleValue(e) {
+        let key = e.target.id
+        let value = e.target.value
+        let type = e.target.type
+        if (type === 'number') value = value ? value * 1 : 0
+        console.log(value, type)
+        if (selectElement) selectElement.setActions(key, value)
+    }
+</script>
+</body>
+</html>

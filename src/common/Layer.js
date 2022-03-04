@@ -5,7 +5,8 @@
 import Tool from "./Tool";
 
 export default class Layer {
-    constructor() {
+    constructor(name) {
+        this.name = name;
         this.elements = []
     }
 
@@ -13,6 +14,7 @@ export default class Layer {
     add(type, config) {
         if (!config.id) config.id = Tool.getUUID('view_canvas_el:');//设置默认id
         config.zIndex = this.elements.length;
+        config.layer = this.name;
         const el = new type(config)
         this.elements.push(el)
         return el;
@@ -30,6 +32,7 @@ export default class Layer {
     remove(id) {
         if (!!id) {
             let index = this.elements.findIndex(el => el.id === id);
+            this.elements[index].destroy();
             this.elements.splice(index, 1);
         }
     }

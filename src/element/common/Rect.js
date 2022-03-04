@@ -36,8 +36,6 @@ export default class Rect extends Element {
         x2 = x + width;//右x
         y1 = y;//上y
         y2 = y + height;//下y
-        this.boundaries = [[x1, y1], [x2, y1], [x2, y2], [x1, y2]]
-        this.center.x = (x1 + x2) / 2
-        this.center.y = (y1 + y2) / 2
+        this.setBoundaries(x1, x2, y1, y2);
     }
 }

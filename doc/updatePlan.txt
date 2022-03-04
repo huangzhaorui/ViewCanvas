@@ -79,7 +79,7 @@
     -b、元素背景的渐变色实现，且支持渐变色的动画
     c、元素actions新增透明度：borderRadius
     d、元素actions新增圆角：borderRadius
-    e、元素actions新增基于x轴旋转角度，圆心为元素的center
+    #e、元素actions新增基于x轴旋转角度，圆心为元素的center
     #f、otherRender辅助函数...
     #g、元素可以通过编辑点调整大小
     h、Circle元素单独实现点编辑
@@ -99,7 +99,29 @@
     #d、layers删除元素增强
     #e、计算整体元素边界bug
     #f、使用isCanUseSelect时，没有进入框选模式需要加提示
-
 2021-12-1
 1、元素
     #a、过渡效果bug修改
+    #b、新增canEvent属性
+    c、当使用x、y、width、height、r等改变元素轮廓的参数，需要监听
+    #d、容器需要新增calc函数，用于实现子元素在父元素的大小改变时，通过百分比的形式设置大小
+    e、圆的编辑功能
+    f、修改容器CONFIG中父子关联过度（引用过深）的问题
+    #g、元素整体的透明度，旋转功能
+    #h、元素文字新增偏移量fontOffsetX、fontOffsetY
+2、机制优化
+    a、动画单独用一个工作者线程处理，不阻塞也不被渲染主线程阻塞
+    b、将离屏canvas的渲染更改为工作者线程异步处理
+3、文档
+    a、开始文档的编写工作--->12月完成
+4、编辑器
+    a、开始编辑器工作-->1月开始
+5、其他
+    a、base.less中canvas样式加强
+
+2022-2-20
+1、元素
+    #a、基础元素、容器元素旋转实现
+    #b、元素保存layer名
+    #c、容器子元素可以依赖父元素的width、height设置百分比
+    #d、新增input元素

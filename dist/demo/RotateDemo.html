@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.css">
+    <title>旋转</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+<div id="app" style="width:100vw;height: 100vh;background: aquamarine"></div>
+<!--<i class="fa fa-camera-retro fa-5x" id="text"></i>-->
+<script src="../ViewCanvas.js"></script>
+<script>
+    let VIEW = View;
+    let el = document.getElementById('app');
+    let canvas = new VIEW.Stage(el, {
+        config: {
+            // fps: 60,
+            mode: VIEW.MODE.EDIT,
+            // background: 'green'
+        },
+        handler: {
+            otherRenderCall(e) {
+
+            },
+            clickCall(e, el) {
+                // if (el.type === 'BrokenLine') {
+                // el.showEditPoint()
+                // el.showTestLine = true
+                // }
+                console.log('left', el);
+            },
+            cancelCall(e, el) {
+                // if (el.type === 'BrokenLine') {
+                // el.clearEditPoint()
+                // el.showTestLine = false
+                // }
+                // console.log('cancel', el);
+            },
+            rightClickCall(e, el) {
+                // console.log('right', el)
+            },
+            centerClickCall(e, el) {
+                // console.log('center', el)
+            },
+            hoverCall(e, el) {
+                // console.log('hover', el);
+            },
+            leaveCall(e, el) {
+                // console.log('leaveCall', el);
+            },
+            dragStartCall(e, el) {
+                // console.log('dragStart', el);
+            },
+            dragCall(e, el) {
+                // console.log('drag', el);
+            },
+            dragEndCall(e, el) {
+                // console.log('dragEnd', el);
+            },
+            moveCall(e) {
+                // console.log('move', e);
+            },
+            zoomCall(e, flag) {
+                // console.log(flag);
+            },
+            editCall() {
+                console.log(arguments)
+            }
+        }
+    })
+    canvas.addEl({
+        type: 'Rect',
+        x: 100,
+        y: 100,
+        params: {
+            showTestLine: true,
+            showTestBoundariesPoint: true,
+            width: 100,
+            height: 100,
+            r: 50
+        },
+        actions: {
+            default: {
+                backgroundColor: 'white',
+                shadowSize: 4,
+                shadowColor: 'black',
+                // rotate: 0,
+                fontText: '243567898',
+                fontColor: 'black'
+            },
+            hover: {
+                // rotate: 45,
+            }
+        },
+        animations: {
+            rotate: {process: {0: 0, 100: 360}, duration: 2},
+        }
+    })
+
+    canvas.addEl({
+        type: 'Container',
+        x: 600,
+        y: 100,
+        params: {
+            showTestLine: true,
+            showTestBoundariesPoint: true,
+            width: 100,
+            height: 100
+        },
+        actions: {
+            default: {
+                backgroundColor: 'transparent',
+                // rotate: 45,
+            }
+        },
+        animations: {
+            rotate: {process: {0: 0, 100: 180}, duration: 1, loop: false},
+        },
+        children: [
+            {
+                type: 'Rect',
+                x: 10,
+                y: 0,
+                params: {
+                    width: 80,
+                    height: 100
+                },
+                actions: {
+                    default: {
+                        // backgroundColor: {
+                        //     type: 'Linear',
+                        //     colors: [['white', 0], ['black', 0.5], ['white', 1]]
+                        // },
+                        backgroundColor: 'green',
+                        fontText: '田田田',
+                        // fontSize: 40,
+                        fontColor: 'white',
+                        fontPosition: 'top'
+                    },
+                    hover: {
+                        // backgroundColor: 'red'
+                    },
+                    click: {
+                        // backgroundColor: 'blue'
+                    },
+                    drag: {
+                        // backgroundColor: 'white'
+                    }
+                },
+                animations: {
+                    // backgroundColor: {process: {0: 'red', 100: 'blue'}, duration: 1},
+                    // fontColor: {process: {0: 'yellow', 100: 'white'}, duration: 1},
+                }
+            },
+            {
+                type: 'Circle',
+                x: 0,
+                y: 10,
+                params: {
+                    r: 5
+                },
+                actions: {
+                    default: {
+                        backgroundColor: '#E6A23C',
+                    }
+                }
+            },
+            {
+                type: 'Circle',
+                x: 90,
+                y: 10,
+                params: {
+                    r: 5
+                },
+                actions: {
+                    default: {
+                        backgroundColor: '#E6A23C',
+                    },
+                    hover: {
+                        backgroundColor: 'red',
+                    }
+                }
+            }
+        ]
+    })
+</script>
+</body>
+</html>

@@ -1,14 +1,5 @@
 {
   "default": {
     "backgroundColor": "transparent"
-  },
-  "hover": {
-    "backgroundColor": "transparent"
-  },
-  "click": {
-    "backgroundColor": "transparent"
-  },
-  "drag": {
-    "backgroundColor": "transparent"
   }
 }

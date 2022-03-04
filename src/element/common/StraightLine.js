@@ -149,8 +149,6 @@ export default class StraightLine extends Element {
         const x2 = Math.max(...xList)
         const y1 = Math.min(...yList)
         const y2 = Math.max(...yList)
-        this.boundaries = [[x1, y1], [x2, y1], [x2, y2], [x1, y2]]
-        this.center.x = (x1 + x2) / 2
-        this.center.y = (y1 + y2) / 2
+        this.setBoundaries(x1, x2, y1, y2);
     }
 }

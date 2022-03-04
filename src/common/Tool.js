@@ -170,4 +170,25 @@ export default class Tool {
         })
     }
 
+    //计算
+    static judgeXY(angle, center, r) {
+        let x = Math.sin(Math.PI / 180 * angle) * r;
+        let y = Math.cos(Math.PI / 180 * angle) * r;
+        return {x: center.x + x, y: center.y + y};
+    }
+
+    //数学字符串模板
+    static evalMathStr(str, v) {
+        let s = str;
+        if (/%/g.test(str)) str = str.replace(/%/g, `*${v / 100}`);
+        if (/px/g.test(str)) str = str.replace(/px/g, '');
+        let value;
+        try {
+            value = eval(str);
+        } catch (e) {
+            console.error('字符串模板不正确：', s, e)
+        }
+        return value
+    }
+
 }

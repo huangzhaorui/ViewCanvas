@@ -21,10 +21,10 @@ export default class Scene extends Base {
             this[key] = handler[key];
         }
         this.layers = {
-            control: new Layer(),//控件层
-            temporary: new Layer(),//临时层
-            element: new Layer(),//元素层
-            background: new Layer()//背景层
+            control: new Layer('control'),//控件层
+            temporary: new Layer('temporary'),//临时层
+            element: new Layer('element'),//元素层
+            background: new Layer('background')//背景层
         };
         //前端渲染canvas
         this.canvasFront = document.createElement('canvas', {alpha: false});
@@ -585,6 +585,7 @@ export default class Scene extends Base {
     judgeHasElementInMouseRange(e) {
         const elList = this.layers.element
             .get({canRender: true})
+            .filter(el => el.canEvent)//只寻找能响应事件的元素
             .filter(el => el.judgeValueIsInRange(e, this.context));
         if (elList.length) {
             elList.sort((a, b) => b.renderZIndex - a.renderZIndex);
@@ -614,10 +615,17 @@ export default class Scene extends Base {
     }
 
     //删除层元素
-    remove(elList, layer = 'element') {
-        if (elList.length === 0) return
-        elList.forEach(el => {
-            if (el) this.layers[layer].remove(el.id)
+    remove(el) {
+        let list = [];
+        if (Tool.judgeType(el)) {
+            list = [el]
+        }
+        if (Tool.judgeType(el, 4)) {
+            list = [...el]
+        }
+        list.forEach(el => {
+            let {layer, id} = el;
+            if (el) this.layers[layer].remove(id)
         })
     }
 
@@ -628,18 +636,15 @@ export default class Scene extends Base {
 
     //计算整体元素边界
     computeAllElementBoundary() {
-        let coordinate;
+        let coordinate = {x1: 0, x2: 0, y1: 0, y2: 0};
         this.layers.element.elements.forEach((el, i) => {
             let {boundaries} = el;
             let x1 = boundaries[0][0], x2 = boundaries[2][0], y1 = boundaries[0][1], y2 = boundaries[2][1];
-            if (i === 0) {
-                coordinate = {x1, x2, y1, y2};
-            } else {
-                if (x1 < coordinate.x1) coordinate.x1 = x1;//左上角x
-                if (x2 > coordinate.x2) coordinate.x2 = x2;//右下角x
-                if (y1 < coordinate.y1) coordinate.y1 = y1;//左上角y
-                if (y2 > coordinate.y2) coordinate.y2 = y2;//右下角y
-            }
+            if (x1 < coordinate.x1) coordinate.x1 = x1;//左上角x
+            if (x2 > coordinate.x2) coordinate.x2 = x2;//右下角x
+            if (y1 < coordinate.y1) coordinate.y1 = y1;//左上角y
+            if (y2 > coordinate.y2) coordinate.y2 = y2;//右下角y
+
         })
         let {x1, y1, x2, y2} = coordinate;
         return [x1, y1, x2 - x1, y2 - y1];
@@ -656,7 +661,7 @@ export default class Scene extends Base {
         } else {
             this.zoomObj.curZoom = width / boundaries[2] * 10;
         }
-        console.log(this.zoomObj.curZoom, width, height, boundaries[2], boundaries[3])
+        // console.log(this.zoomObj.curZoom, width, height, boundaries[2], boundaries[3])
         this.setViewInPosition(centerX, centerY);
         this.zoomObj.fontX = this.offsetX;
         this.zoomObj.fontY = this.offsetY;

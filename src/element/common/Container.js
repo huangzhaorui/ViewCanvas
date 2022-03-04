@@ -52,21 +52,21 @@ export default class Container extends Element {
             el.isHover = true
             if (this.hoverEl) {
                 if (!this.judgeIsSameEl(el, 'hover')) {
-                    if (this.hoverEl.canHover && !!$.leaveCall) $.leaveCall($.mouseMoveEvent, this.hoverEl);
+                    if (!this.hoverEl.disabled && this.hoverEl.canHover && !!$.leaveCall) $.leaveCall($.mouseMoveEvent, this.hoverEl);
                     this.hoverEl.isHover = false;
                     this.hoverEl = el;
                     $.canvasFront.classList = [$.cursorClass[el.elementMouseStyleHandler('hover')]];
-                    if (el.canHover && !!$.hoverCall) $.hoverCall($.mouseMoveEvent, el);
+                    if (!el.disabled && el.canHover && !!$.hoverCall) $.hoverCall($.mouseMoveEvent, el);
                 }
             } else {
                 this.hoverEl = el;
                 $.canvasFront.classList = [$.cursorClass[el.elementMouseStyleHandler('hover')]];
-                if (el.canHover && !!$.hoverCall) $.hoverCall($.mouseMoveEvent, el);
+                if (!el.disabled && el.canHover && !!$.hoverCall) $.hoverCall($.mouseMoveEvent, el);
             }
         } else {//无子元素
             if (this.hoverEl) {
                 this.hoverEl.isHover = false;
-                if (this.hoverEl.canHover && !!$.leaveCall) $.leaveCall($.mouseMoveEvent, this.hoverEl);
+                if (!this.hoverEl.disabled && this.hoverEl.canHover && !!$.leaveCall) $.leaveCall($.mouseMoveEvent, this.hoverEl);
                 this.hoverEl = null;
                 $.canvasFront.classList = [$.cursorClass[this.elementMouseStyleHandler('hover')]];
                 if (!!$.hoverCall) $.hoverCall($.mouseMoveEvent, this);
@@ -85,7 +85,7 @@ export default class Container extends Element {
             if (el) {//点击到了容器中的子元素
                 el.isClick = true
                 this.clickEl = el;
-                if (el.canClick && !!$.clickCall) $.clickCall($.mouseMoveEvent, el);
+                if (!el.disabled && el.canClick && !!$.clickCall) $.clickCall($.mouseMoveEvent, el);
             } else {//没有点击到容器中的子元素
                 this.isClick = true
                 if (!!$.clickCall) $.clickCall($.mouseMoveEvent, this);
@@ -93,7 +93,7 @@ export default class Container extends Element {
         } else {//容器是场景的clickEl
             if (el) {//点击到了容器中的子元素
                 if (this.clickEl) {//容器有clickEl
-                    if (this.clickEl.canClick && !!$.cancelCall) $.cancelCall($.mouseMoveEvent, this.clickEl);
+                    if (!this.clickEl.disabled && this.clickEl.canClick && !!$.cancelCall) $.cancelCall($.mouseMoveEvent, this.clickEl);
                     if (this.judgeIsSameEl(el, 'click')) {//点击到的子元素是容器的clickEl，清空容器的clickEl
                         this.clickEl.isClick = false;
                         this.clickEl = null;
@@ -103,19 +103,19 @@ export default class Container extends Element {
                         this.clickEl.isClick = false;
                         el.isClick = true
                         this.clickEl = el;
-                        if (el.canClick && !!$.clickCall) $.clickCall($.mouseMoveEvent, el);
+                        if (!el.disabled && el.canClick && !!$.clickCall) $.clickCall($.mouseMoveEvent, el);
                     }
                 } else {//容器没有clickEl
                     if (!!$.cancelCall) $.cancelCall($.mouseMoveEvent, this);
                     el.isClick = true
                     this.clickEl = el;
-                    if (el.canClick && !!$.clickCall) $.clickCall($.mouseMoveEvent, el);
+                    if (!el.disabled && el.canClick && !!$.clickCall) $.clickCall($.mouseMoveEvent, el);
                 }
             } else {//没有点击到容器中的子元素
                 if (this.clickEl) {//容器有clickEl，清空clickEl
                     this.isClick = true;
                     this.clickEl.isClick = false;
-                    if (this.clickEl.canClick && !!$.cancelCall) $.cancelCall($.mouseMoveEvent, this.clickEl);
+                    if (!this.clickEl.disabled && this.clickEl.canClick && !!$.cancelCall) $.cancelCall($.mouseMoveEvent, this.clickEl);
                     this.clickEl = null;
                     if (!!$.clickCall) $.clickCall($.mouseMoveEvent, this);
                 } else {//容器没有clickEl，清空场景clickEl
@@ -129,6 +129,7 @@ export default class Container extends Element {
 
     //子元素拖拽处理
     childrenDragCall(context, flag) {
+        if (!this.canEvent) return;
         if (this.disabled) return
         if (!this.canDrag) return
         // let el = this.checkChildren(context);
@@ -153,19 +154,14 @@ export default class Container extends Element {
     //判断鼠标范围内是否存在元素
     judgeHasElementInMouseRange(context) {
         let mouseMoveEvent = View.SCENE_LIST[this.sceneId].mouseMoveEvent;
-        const elList = this.children.filter(el => el.judgeValueIsInRange(mouseMoveEvent, context));
+        context.save();
+        this.setRotate(context);
+        const elList = this.children.filter(el => el.canEvent && el.judgeValueIsInRange(mouseMoveEvent, context));
+        context.restore();
         if (elList.length) {
             elList.sort((a, b) => b.renderZIndex - a.renderZIndex);
             return elList[0];
         } else return null;
-    }
-
-    //扩展渲染
-    preRender(context) {
-        let {x, y, style} = this
-        //是否进行文字渲染
-        if (!style.fontIcon && !style.fontText) return
-        new View.Elements.Text(context, x, y, style)
     }
 
     //计算边界
@@ -176,13 +172,25 @@ export default class Container extends Element {
         x2 = x + width;//右x
         y1 = y;//上y
         y2 = y + height;//下y
-        this.boundaries = [[x1, y1], [x2, y1], [x2, y2], [x1, y2]];
-        this.center.x = (x1 + x2) / 2;
-        this.center.y = (y1 + y2) / 2;
+        this.setBoundaries(x1, x2, y1, y2);
         //父元素计算边界时，调整子元素x,y，并计算子元素边界
         children.forEach(c => {
-            c.x = x + c.CONFIG.x;
-            c.y = y + c.CONFIG.y;
+            /**
+             * 子元素参数赋值渲染
+             */
+            let {x, y, params} = c.CONFIG;
+            //x
+            if (Tool.judgeType(x, 0)) c.x = this.x + Tool.evalMathStr(x, this.width);
+            else c.x = this.x + x;
+            //y
+            if (Tool.judgeType(y, 0)) c.y = this.y + Tool.evalMathStr(y, this.height);
+            else c.y = this.y + y;
+            //width
+            if (Tool.judgeType(params.width, 0)) c.width = Tool.evalMathStr(params.width, this.width);
+            else c.width = params.width;
+            //height
+            if (Tool.judgeType(params.height, 0)) c.height = Tool.evalMathStr(params.height, this.height);
+            else c.height = params.height;
             if (c.judgeBoundaries()) c.judgeBoundaries();
             //回调关联元素的修改
             for (const id in c.relationEl) {
@@ -194,14 +202,12 @@ export default class Container extends Element {
 
     //新增子元素
     add(config) {
-        let {x, y, children} = this;
+        let {children} = this;
         if (!config.id) config.id = Tool.getUUID('view_canvas_el_child:');//设置默认id
         config.sceneId = this.sceneId;
         config.parent = this;
         config.zIndex = children.length;
         let child = new View.Elements[config.type](config)
-        child.x = x + child.CONFIG.x;
-        child.y = y + child.CONFIG.y;
         child.canEdit = false;//子元素不能通过编辑节点编辑大小
         children.push(child)
     }
